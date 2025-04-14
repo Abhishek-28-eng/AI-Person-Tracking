@@ -1,0 +1,32 @@
+# Set base image
+FROM python:3.10-slim
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Install system dependencies for OpenCV and other libraries
+RUN apt-get update && apt-get install -y \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    libsm6 \
+    libxext6 \
+    libxrender-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy ONLY the requirements.txt from the global directory
+COPY requirements_cpu.txt ./
+
+# Install dependencies
+RUN pip install --no-cache-dir -r requirements_cpu.txt
+
+# Copy the global_tracking.py script
+COPY global_tracking.py ./
+
+# Copy the calibration file into the container
+COPY calibration_building_k_edit.json ./
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1
+
+# Define the command to run the application
+CMD ["python", "global_tracking.py"]

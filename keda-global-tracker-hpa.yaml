@@ -1,0 +1,37 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledJob
+metadata:
+  name: global-tracking-scalar
+spec:
+  jobTargetRef:
+    parallelism: 1
+    completions: 1
+    activeDeadlineSeconds: 600
+    template:
+      spec:
+        restartPolicy: Never
+        containers:
+          - name: global-tracker
+            image: global-tracker
+            volumeMounts:
+              - name: preds-storage
+                mountPath: /app/track/preds/  # Input directory
+              - name: global-preds-storage
+                mountPath: /app/global_preds/  # Output directory
+            env:
+              - name: VIDEO_FILE
+                value: "/app/track/preds/${KEDA_SCALER_TRIGGER_VALUE}"  # Input file
+        volumes:
+          - name: preds-storage
+            persistentVolumeClaim:
+              claimName: preds-pvcu
+          - name: global-preds-storage
+            persistentVolumeClaim:
+              claimName: global-preds-pvc
+  triggers:
+    - type: filesystem
+      metadata:
+        path: "/app/track/preds/"
+        filePattern: "Building_K_Cam*"
+        cooldownPeriod: "30"
+        pollingInterval: "10"

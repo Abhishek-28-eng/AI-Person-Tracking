@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: file-watcher
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: file-watcher
+  template:
+    metadata:
+      labels:
+        app: file-watcher
+    spec:
+      containers:
+      - name: watcher
+        image: alpine
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            apk add --no-cache inotify-tools
+            mkdir -p /app/track/preds
+            while inotifywait -e create /app/preds; do
+              for file in /app/track/preds/*.txt; do
+                echo "New detection file found: $file"
+                kubectl create job --from=cronjob/global-tracker-cronjob global-tracker-job-$(date +%s)
+              done
+            done    
+        volumeMounts:
+        - mountPath: "/app/track/preds"
+          name: preds-storage
+      volumes:
+      - name: preds-storage
+        persistentVolumeClaim:
+          claimName: preds-pvc

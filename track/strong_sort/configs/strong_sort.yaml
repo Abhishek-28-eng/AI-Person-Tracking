@@ -1,0 +1,20 @@
+# STRONGSORT:
+#   ECC: True              # activate camera motion compensation
+#   MC_LAMBDA: 0.95       # matching with both appearance (1 - MC_LAMBDA) and motion cost
+#   EMA_ALPHA: 0.9         # updates  appearance  state in  an exponential moving average manner
+#   MAX_DIST: 0.2          # The matching threshold. Samples with larger distance are considered an invalid match
+#   MAX_IOU_DISTANCE: 0.7  # Gating threshold. Associations with cost larger than this value are disregarded.
+#   MAX_AGE: 500            # Maximum number of missed misses before a track is deleted
+#   N_INIT: 10              # Number of frames that a track remains in initialization phase
+#   NN_BUDGET: 150         # Maximum size of the appearance descriptors gallery
+
+
+STRONGSORT:
+  ECC: True              # Keep camera motion compensation active
+  MC_LAMBDA: 0.98        # Slightly reduce motion weight for better appearance matching
+  EMA_ALPHA: 0.7         # Reduce to make the appearance model more adaptable
+  MAX_DIST: 0.2          # Increase matching threshold to handle occlusions
+  MAX_IOU_DISTANCE: 0.65 # Lower to avoid incorrect matches during occlusion
+  MAX_AGE: 500           # Increase to maintain tracks longer during occlusion
+  N_INIT: 5              # Increase initialization frames for track confirmation
+  NN_BUDGET: 150         # Expand the budget for storing appearance features

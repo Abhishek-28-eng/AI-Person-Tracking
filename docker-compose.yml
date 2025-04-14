@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  tracker:
+    build:
+      context: ./global  # Use the "global" directory for building
+      dockerfile: Dockerfile
+    volumes:
+      - ./track/preds/Building_K_Cam1/:/app/track/Building_K_Cam1/  # Mount ONLY the "track" folder from tracker_kube_abhishek
+    environment:
+      - PYTHONUNBUFFERED=1
+      - RUNNING_IN_DOCKER=1
+    command: ["python", "global_tracking.py"]

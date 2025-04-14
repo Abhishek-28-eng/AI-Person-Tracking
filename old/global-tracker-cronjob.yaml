@@ -1,0 +1,31 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: global-tracker-cronjob
+spec:
+  schedule: "*/5 * * * *"  # Runs every 5 minutes (Modify as needed)
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+          - name: global-tracker-container
+            image: global-tracking-cpu:latest
+            imagePullPolicy: Never
+            args:
+              - "python3"
+              - "global_tracking.py"
+            volumeMounts:
+            - mountPath: "/app/preds"
+              name: preds-storage
+            - mountPath: "/app/global_preds"
+              name: global-preds-storage
+          volumes:
+          - name: preds-storage
+            persistentVolumeClaim:
+              claimName: preds-pvc
+          - name: global-preds-storage
+            persistentVolumeClaim:
+              claimName: global-preds-pvc
+

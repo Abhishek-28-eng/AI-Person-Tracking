@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: track-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: track
+  template:
+    metadata:
+      labels:
+        app: track
+    spec:
+      restartPolicy: Always
+      containers:
+      - name: track-container
+        image: track-gpu:latest
+        imagePullPolicy: Never
+        volumeMounts:
+        - mountPath: "/app/track/preds/"
+          name: preds-storage
+        env:
+        - name: SOURCES_FILE
+          value: "/app/sources.txt"
+      volumes:
+      - name: preds-storage
+        persistentVolumeClaim:
+          claimName: preds-pvcu

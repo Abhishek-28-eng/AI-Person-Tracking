@@ -1,0 +1,19 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: video-processing-scaler
+spec:
+  scaleTargetRef:
+    kind: CronJob
+    apiVersion: batch/v1
+    name: global-tracker-cronjob
+  pollingInterval: 10  # Check every 10 seconds
+  cooldownPeriod: 30  # Scale down after 30 seconds
+  minReplicaCount: 1
+  maxReplicaCount: 5
+  triggers:
+    - type: filesystem
+      metadata:
+        path: "/app/preds"
+        timeout: "30"
+
